@@ -33,8 +33,9 @@ prompt = PromptTemplate(template=prompt_template, input_variables=["text"])
 
 # Define a Document class to wrap content properly
 class Document:
-    def __init__(self, page_content):
+    def __init__(self, page_content, metadata=None):
         self.page_content = page_content
+        self.metadata = metadata or {}  # Set metadata as an empty dictionary if not provided
 
 # Function to load YouTube content using yt-dlp
 def load_youtube_content(url):
@@ -69,7 +70,7 @@ if st.button("Summarize the Content from YT or Website"):
                         headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"}
                     )
                     loaded_docs = loader.load()
-                    docs = [Document(page_content=doc.page_content) for doc in loaded_docs]  # Standardize document structure
+                    docs = [Document(page_content=doc.page_content, metadata=doc.metadata) for doc in loaded_docs]  # Standardize document structure
 
                 # Chain for summarization
                 chain = load_summarize_chain(llm, chain_type="stuff", prompt=prompt)
