@@ -1,0 +1,11 @@
+pandas
+numpy
+streamlit
+streamlit-option-menu
+streamlit-extras
+scikit-learn
+plotly
+folium
+streamlit-folium
+joblib
+statsmodels
