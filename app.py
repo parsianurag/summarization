@@ -31,6 +31,11 @@ Content:{text}
 """
 prompt = PromptTemplate(template=prompt_template, input_variables=["text"])
 
+# Define a Document class to wrap content properly
+class Document:
+    def __init__(self, page_content):
+        self.page_content = page_content
+
 # Function to load YouTube content using yt-dlp
 def load_youtube_content(url):
     ydl_opts = {
@@ -56,7 +61,7 @@ if st.button("Summarize the Content from YT or Website"):
                 # Load data from the URL
                 if "youtube.com" in generic_url:
                     content = load_youtube_content(generic_url)
-                    docs = [{"page_content": content}]  # Wrap in a mock document structure
+                    docs = [Document(page_content=content)]  # Wrap in Document object
                 else:
                     loader = UnstructuredURLLoader(
                         urls=[generic_url],
@@ -64,7 +69,7 @@ if st.button("Summarize the Content from YT or Website"):
                         headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"}
                     )
                     loaded_docs = loader.load()
-                    docs = [{"page_content": doc.page_content} for doc in loaded_docs]  # Standardize document structure
+                    docs = [Document(page_content=doc.page_content) for doc in loaded_docs]  # Standardize document structure
 
                 # Chain for summarization
                 chain = load_summarize_chain(llm, chain_type="stuff", prompt=prompt)
