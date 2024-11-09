@@ -3,8 +3,8 @@ import validators
 from langchain.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 from langchain.chains.summarize import load_summarize_chain
-from langchain_community.document_loaders import YoutubeLoader, UnstructuredURLLoader
-from pytube.exceptions import PytubeError  # Import PytubeError to handle specific exceptions
+from langchain_community.document_loaders import UnstructuredURLLoader
+import yt_dlp  # yt-dlp for YouTube video processing
 
 # Set page configuration as the first Streamlit command
 st.set_page_config(page_title="LangChain: Summarize Text From YT or Website", page_icon="🦜")
@@ -31,6 +31,18 @@ Content:{text}
 """
 prompt = PromptTemplate(template=prompt_template, input_variables=["text"])
 
+# Function to load YouTube content using yt-dlp
+def load_youtube_content(url):
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'quiet': True,
+        'noplaylist': True,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(url, download=False)
+        description = info_dict.get('description', 'No description available')
+    return description
+
 # Button to start summarization
 if st.button("Summarize the Content from YT or Website"):
     # Validate inputs
@@ -43,12 +55,7 @@ if st.button("Summarize the Content from YT or Website"):
             with st.spinner("Waiting..."):
                 # Load data from the URL
                 if "youtube.com" in generic_url:
-                    try:
-                        loader = YoutubeLoader.from_youtube_url(generic_url, add_video_info=True)
-                        docs = loader.load()
-                    except PytubeError as yt_error:
-                        st.error("Failed to load YouTube video. Please try a different video or report this issue.")
-                        st.stop()
+                    docs = [load_youtube_content(generic_url)]
                 else:
                     loader = UnstructuredURLLoader(
                         urls=[generic_url],
