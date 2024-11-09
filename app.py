@@ -1,9 +1,12 @@
-import validators
 import streamlit as st
+import validators
 from langchain.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 from langchain.chains.summarize import load_summarize_chain
 from langchain_community.document_loaders import YoutubeLoader, UnstructuredURLLoader
+
+# Set page configuration as the first Streamlit command
+st.set_page_config(page_title="LangChain: Summarize Text From YT or Website", page_icon="🦜")
 
 # Debugging: Check if the API key is accessible
 if "GROQ_API_KEY" in st.secrets:
@@ -11,10 +14,9 @@ if "GROQ_API_KEY" in st.secrets:
 else:
     st.write("API Key missing from secrets")
 
-# Streamlit APP
-st.set_page_config(page_title="LangChain: Summarize Text From YT or Website", page_icon="🦜")
+# Streamlit APP Title and Subtitle
 st.title("🦜 LangChain: Summarize Text From YT or Website")
-st.subheader('Summarize URL')
+st.subheader("Summarize URL")
 
 # Get the URL (YT or website) to be summarized
 generic_url = st.text_input("URL", label_visibility="collapsed")
