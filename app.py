@@ -55,14 +55,16 @@ if st.button("Summarize the Content from YT or Website"):
             with st.spinner("Waiting..."):
                 # Load data from the URL
                 if "youtube.com" in generic_url:
-                    docs = [load_youtube_content(generic_url)]
+                    content = load_youtube_content(generic_url)
+                    docs = [{"page_content": content}]  # Wrap in a mock document structure
                 else:
                     loader = UnstructuredURLLoader(
                         urls=[generic_url],
                         ssl_verify=False,
                         headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_5_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"}
                     )
-                    docs = loader.load()
+                    loaded_docs = loader.load()
+                    docs = [{"page_content": doc.page_content} for doc in loaded_docs]  # Standardize document structure
 
                 # Chain for summarization
                 chain = load_summarize_chain(llm, chain_type="stuff", prompt=prompt)
